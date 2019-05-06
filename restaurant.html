@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>360&deg; Image Gallery</title>
+    <meta name="description" content="360&deg; Image Gallery - A-Frame">
+    <script src="https://aframe.io/releases/0.9.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@5/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-layout-component@5.3.0/dist/aframe-layout-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-proxy-event-component@2.1.0/dist/aframe-proxy-event-component.min.js"></script>
+    <script src="restaurant.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.4.0.js"
+  integrity="sha256-DYZMCC8HTC+QDr5QNaIcfR7VSPtcISykd+6eSmBW5qo="
+  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img id="city" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg">
+        <img id="city-thumb" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-city.jpg">
+        <img id="cubes-thumb" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-cubes.jpg">
+        <img id="sechelt-thumb" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-sechelt.jpg">
+        <audio id="click-sound" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/audio/click.ogg"></audio>
+        <img id="cubes" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/cubes.jpg">
+        <img id="data-thumb" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-sechelt.jpg">
+        <img id="sechelt" crossorigin="anonymous" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/sechelt.jpg">
+        <img id="path1" crossorigin="anonymous" src="https://cdn.glitch.com/65fdc5c6-b264-4063-b428-c9893a0c2ab4%2F360%20panorama%20lombard%20street%20san%20francisco%20-%206286x3143.jpg?1557018823786">
+        <img id="path2" crossorigin="anonymous" src="https://cdn.glitch.com/65fdc5c6-b264-4063-b428-c9893a0c2ab4%2F360%20Boudin%20%20SF%20Embarcadero%20-%206988x3494.jpg?1557019030788">
+        <img id="path3" crossorigin="anonymous" src="https://cdn.glitch.com/65fdc5c6-b264-4063-b428-c9893a0c2ab4%2F360%20hard%20rock%20pier%2039%20SF%20-%206980x3490.jpg?1556564623872">
+        <img id="park4" crossorigin="anonymous" src="https://cdn.glitch.com/65fdc5c6-b264-4063-b428-c9893a0c2ab4%2Fsf%20lake%20merced%20360%20panorama%20-%206290x3145%20(1).jpg?1556561852918">
+        <img id="restaurant" crossorigin="anonymous" src="https://cdn.glitch.com/65fdc5c6-b264-4063-b428-c9893a0c2ab4%2F360%20panoramic%20Restaurant%20front%20-%206292x3146.jpg?1556562094196">
+        <img id="home" crossorigin="anonymous" src="https://cdn.glitch.com/65fdc5c6-b264-4063-b428-c9893a0c2ab4%2Fkitchen%20360%20panorama%20%20-%206988x3494.jpg?1556564704009">
+        <!-- Image link template to be reused. -->
+        <script id="link" type="text/html">
+          <a-entity class="link"
+            geometry="primitive: plane; height: 1; width: 1"
+            material="shader: flat; src: ${thumb}"
+            event-set__mouseenter="scale: 1.2 1.2 1"
+            event-set__mouseleave="scale: 1 1 1"
+            event-set__click="_target: #image-360; _delay: 300; material.src: ${src}"
+            proxy-event="event: click; to: #image-360; as: fade"
+            sound="on: click; src: #click-sound"></a-entity>
+        </script>
+      </a-assets>
+
+      <!-- 360-degree image. -->
+      <a-sky id="image-360" radius="10" src="#home"
+             animation__fade="property: components.material.material.color; type: color; from: #FFF; to: #000; dur: 300; startEvents: fade"
+             animation__fadeback="property: components.material.material.color; type: color; from: #000; to: #FFF; dur: 300; startEvents: animationcomplete__fade"></a-sky>
+      
+      <!-- This is for text to be appended when you're home -->
+      <a-entity id="text" layout="type: line; margin: 1.5" position="0 0 -5">
+        
+      </a-entity>
+      
+      <!-- Image links. -->
+      <a-entity id="links" layout="type: line; margin: 1.5" position="0 -1 -4">
+        <!-- Backward arrow -->
+        <a-entity class="link"
+            event-set__mouseenter="scale: 1.2 1.2 1"
+            onclick="decrement()"
+            geometry="primitive: triangle" 
+            material="color:red"
+            rotation="0 0 90"
+            event-set__mouseleave="scale: 1 1 1"
+            sound="on: click; src: #click-sound"></a-entity>
+        <!-- Forward arrow -->
+        <a-entity class="link"
+            event-set__mouseenter="scale: 1.2 1.2 1"
+            onclick="increment()"
+            geometry="primitive: triangle" 
+            material="color:blue"
+            rotation="0 0 270"
+            event-set__mouseleave="scale: 1 1 1"
+            sound="on: click; src: #click-sound"></a-entity>
+      </a-entity>
+      
+
+      <!-- Camera + cursor. -->
+      <a-entity id="camera" camera look-controls>
+        <!--
+        <a-entity cursor="fuse: true; fuseTimeout: 500"
+            position="0 0 -1"
+            geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+            material="color: black; shader: flat"
+            animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+          animation__fusing="property: fusing; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+          event-set__mouseenter="_event: mouseenter; color: springgreen"
+          event-set__mouseleave="_event: mouseleave; color: black"
+          raycaster="objects: .link"      
+                  >
+        </a-entity>-->
+        
+        <a-entity geometry="primitive: plane; height: 0.8; width: 12"
+                  material="color: white"
+                  id ="timer"
+                  text="width: 12; color: black; value:  Time Elapsed: 00:00;"
+                  position= "0.2 4 -4" ></a-entity>
+
+        
+        <a-entity geometry="primitive: plane; height: 0.8; width: 0.00001;"
+                  material="color: white"
+                  id = "distance"
+                  text=" width: 12; color: black; value: Distance: 0ft"
+                  position= "5.5 4 -4" ></a-entity>
+        
+        <a-entity geometry="primitive: plane; height: 0.9; width: 2.5"
+                  material = "color:blue"
+                  position = "5 4 -3.99"></a-entity>
+        <a-entity text=" width: 8; color: black; value:Go Back" 
+                  position = "8.3 4 -3.98"></a-entity>
+        
+        <a-cursor
+          id="cursor"
+          position="0 0 -1"
+          animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+          animation__fusing="property: fusing; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+          event-set__mouseenter="_event: mouseenter; color: springgreen"
+          event-set__mouseleave="_event: mouseleave; color: black"
+          raycaster="objects: .link"></a-cursor>
+      </a-entity>
+    </a-scene>
+    
+    <script>
+      // Go back a location
+      function decrement(){
+          //box.addEventListener('click', function (evt) { // ... });
+          var counter = showCounter();
+          if(counter != 0){
+            var sceneEl = document.getElementById('text');
+            if(sceneEl.hasChildNodes())
+              sceneEl.removeChild(sceneEl.childNodes[0]);
+            
+            backwardArrow();
+            counter = showCounter();
+      
+            var pic = ['home', 'path1', 'path2', 'path3', 'restaurant'];
+            var backArrow = document.getElementById('image-360');
+            var src = pic[counter];
+            console.log(src);
+            backArrow.setAttribute('src', '#' + src);
+          }
+          else{
+            var sceneEl = document.getElementById('text');
+            if(!sceneEl.hasChildNodes()){
+              var el = document.createElement('a-text');
+              console.log("decrement" + counter);
+              el.setAttribute('value', "You're currently home");
+              el.setAttribute('id', 'hometext');
+              sceneEl.appendChild(el);
+            }  
+          }
+      }
+      
+    </script>
+    
+    <script>
+      // Go forward a location
+      function increment(){
+          //box.addEventListener('click', function (evt) { // ... });
+          var counter = showCounter();
+          if(counter < 4){
+            var sceneEl = document.getElementById('text');
+            if(sceneEl.hasChildNodes())
+              sceneEl.removeChild(sceneEl.childNodes[0]);
+            
+            forwardArrow();
+            var counter = showCounter();
+            console.log("increment" + counter);
+        
+            var pic = ['home', 'path1', 'path2', 'path3', 'restaurant'];
+            var backArrow = document.getElementById('image-360');
+            var src = pic[counter];
+            console.log(src);
+            backArrow.setAttribute('src', '#' + src);
+          }else{
+              var sceneEl = document.getElementById('text');
+              if(!sceneEl.hasChildNodes()){
+                var el = document.createElement('a-text');
+                console.log("increment" + counter);
+                el.setAttribute('value', "You're currently at destination");
+                el.setAttribute('id', 'hometext');
+                sceneEl.appendChild(el);
+              }
+          }
+      }
+      
+    </script>
+    <script src="timer.js"></script>
+    
+  </body>
+</html>
